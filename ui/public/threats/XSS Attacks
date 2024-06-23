@@ -1,0 +1,13 @@
+{
+        "timestamp": "2024-06-22T14:35:45Z",
+        "client_ip": "198.51.100.2",
+        "method": "GET",
+        "url": "/search?q=<script>alert('XSS')</script>",
+        "http_version": "HTTP/1.1",
+        "status": 200,
+        "referrer": "-",
+        "user_agent": "Mozilla/5.0",
+        "threat_score": 90,
+        "security_issue": "xss_attack",
+        "details": "Cross-site scripting (XSS) attempt detected"
+}

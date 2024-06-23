@@ -37,21 +37,28 @@ const inter = Inter({ subsets: ["latin"] });
 // This function runs only on the server side
 export async function getStaticProps() {
     // Path to the public directory
-    const publicDirectory = path.join(process.cwd(), 'public/pdfs');
+    const publicLogsDirectory = path.join(process.cwd(), 'public/pdfs');
 
     // Read the files in the public directory
-    const fileNames = fs.readdirSync(publicDirectory);
+    const logFilenames = fs.readdirSync(publicLogsDirectory);
+
+    // Path to the public directory
+    const publicThreatsDirectory = path.join(process.cwd(), 'public/threats');
+
+    // Read the files in the public directory
+    const threatFilenames = fs.readdirSync(publicThreatsDirectory);
 
     // Return the list of files as props
     return {
         props: {
-            fileNames: fileNames,
+          logFilenames: logFilenames,
+          threatFilenames: threatFilenames
         },
       revalidate: 5
     };
 }
 
-export default function Home({fileNames}) {
+export default function Home({logFilenames,threatFilenames}) {
   const [toastMessage, setToastMessage] = useState<{
     message: string;
     type: ToastType;
@@ -65,7 +72,9 @@ export default function Home({fileNames}) {
 
   const [roomName, setRoomName] = useState(createRoomName());
 
-  const [files,setFiles] = useState(fileNames)
+  const [logFileNames,setLogFileNames] = useState(logFilenames)
+  const [threatFileNames,setThreatFileNames] = useState(threatFilenames)
+
   const tokenOptions = useMemo(() => {
     return {
       userInfo: { identity: generateRandomAlphanumeric(16) },
@@ -86,14 +95,11 @@ export default function Home({fileNames}) {
     }
     if (!customToken && tokenOptions.userInfo?.identity) {
       md.push({
-        name: "Site Name: ",
-        value: "https://mysite.org",
+        name: "Marketing: ",
+        value: "https://www.phlanx.ai",
       });
-//      md.push({ name: "House Address: ", value: "2515 Mardell Way" });
-//      md.push({
-//        name: "Landlord Name: ",
-//        value: "Sako Properties",
-//      });
+      md.push({ name: "UI: ", value: "https://apps.phlanx.ai" });
+      md.push({ name: "API: ", value: "https://api.phlanx.ai" });
     }
     setMetadata(md);
   }, [liveKitUrl, roomName, tokenOptions, customToken]);
@@ -185,7 +191,8 @@ export default function Home({fileNames}) {
               onConnect={handleConnect}
               metadata={metadata}
               videoFit={appConfig?.video_fit ?? "cover"}
-              files= {files}
+              logFiles= {logFileNames}
+              threatFiles= {threatFilenames}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />

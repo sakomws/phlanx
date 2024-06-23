@@ -27,6 +27,7 @@ import {
   useRemoteParticipants,
   useTracks,
 } from "@livekit/components-react";
+
 import {
   ConnectionState,
   LocalParticipant,
@@ -63,6 +64,7 @@ export interface PlaygroundProps {
   fileNames: string[];
 }
 
+
 const headerHeight = 56;
 
 export default function Playground({
@@ -77,15 +79,19 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
-  files
+  logFiles,
+  threatFiles
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [transcripts, setTranscripts] = useState<ChatMessageType[]>([]);
   const { localParticipant } = useLocalParticipant();
-  const [fileNames, setFileNames] = useState(files);
-  const [updateFileNames, setUpdateFileNames] = useState(false);
+  const [logFileNames, setLogFileNames] = useState(logFiles);
+  const [updateLogFileNames, setUpdateLogFileNames] = useState(false);
+
+  const [threatFileNames, setThreatFileNames] = useState(threatFiles);
+  const [updateThreatFileNames, setUpdateThreatFileNames] = useState(false);
   
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -177,26 +183,40 @@ export default function Playground({
           },
         ]);
       }
-      setUpdateFileNames(true);
+      setUpdateLogFileNames(true);
+      setUpdateThreatFileNames(true);
     },
     [transcripts]
   );
 
-
-  const fetchFileData = async () => {
-    console.log("fetch");
+  const fetchLogFileData = async () => {
+    console.log("fetch logs");
     const response = await fetch('/api/getFiles'); // Adjust the API endpoint as needed
     const newData = await response.json();
-    setFileNames({props:newData});
+    setLogFileNames({props:newData});
   };    
   
   useEffect(() => {
-    if (updateFileNames) {
-      fetchFileData();
-      setUpdateFileNames(false); // Reset the trigger
+    if (updateLogFileNames) {
+      fetchLogFileData();
+      setUpdateLogFileNames(false); // Reset the trigger
     }
-  }, [updateFileNames]);
-    
+  }, [updateLogFileNames]);
+
+  const fetchThreatFileData = async () => {
+    console.log("fetch threats");
+    const response = await fetch('/api/getThreats'); // Adjust the API endpoint as needed
+    const newData = await response.json();
+    setThreatFileNames({props:newData});
+  };    
+  
+  useEffect(() => {
+    if (updateThreatFileNames) {
+      fetchThreatFileData();
+      setUpdateThreatFileNames(false); // Reset the trigger
+    }
+  }, [updateThreatFileNames]);
+
   // combine transcripts and chat together
   useEffect(() => {
     const allMessages = [...transcripts];
@@ -230,11 +250,26 @@ export default function Playground({
   const pdfTileContent =  useMemo(() => {
     return (
       <div class="flex flex-col text-lg text-gray-800 w-full gap-3">
-        { fileNames.map((file,index) => (
+        { logFileNames.map((file,index) => (
         <div class="p-4 flex flex-col rounded shadow border w-full">
             <a href={`/pdfs/${file}`} target="_top">
             <div>{file}</div>
         <div class="text-sm text-gray-600"></div>
+        </a>
+            </div>
+        ))}
+      </div>
+    )
+  })
+
+  const threatsTileContent =  useMemo(() => {
+    return (
+      <div class="flex flex-col text-lg text-gray-800 w-full gap-3">
+        { threatFileNames.map((file,index) => (
+        <div class="p-4 flex flex-col rounded shadow border w-full">
+            <a href={`/threats/${file}`} target="_top" class="flex flex-row items-center justify-between">
+            <div>{file}</div>
+            <div class="text-sm text-gray-600">25</div>
         </a>
             </div>
         ))}
@@ -497,7 +532,14 @@ export default function Playground({
           className={`flex-col basis-1/3 gap-4 h-full hidden lg:flex`}
         >
             <PlaygroundTile
-              title="PDFs"
+              title="Threats"
+              className="w-full h-full grow justify-start"
+              childrenClassName="justify-start"
+            >
+             {threatsTileContent}
+            </PlaygroundTile>
+            <PlaygroundTile
+              title="Sources"
               className="w-full h-full grow justify-start"
               childrenClassName="justify-start"
             >

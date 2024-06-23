@@ -1,5 +1,4 @@
 import random
-from extract_airports import *
 
 
 # Simulated local database of airport features
@@ -87,9 +86,6 @@ def estimate_risk_rate_given_airport(airport_code):
 
 def estimate_risk_rate_given_weather():
     return random.choice([0, 1]) / 1000
-
-
-
 
 prompt_responses = {
     "bad_weather": "In bad weather, a pilot should prioritize safety above all else." + 

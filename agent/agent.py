@@ -7,7 +7,7 @@ from typing import Optional
 from livekit import agents, rtc
 from livekit.plugins import openai, silero
 
-import demo_inference
+# import demo_inference
 
 class SREAgent:
     @classmethod

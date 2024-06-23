@@ -18,6 +18,7 @@ type ChatTileProps = {
   onSend?: (message: string) => Promise<ComponentsChatMessage>;
 };
 
+
 export const ChatTile = ({ messages, accentColor, onSend }: ChatTileProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
